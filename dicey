@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+# pylint: disable=C0111, C0103, C0330
+#
+# dicey v1.0.1 - Generates Diceware™ passphrases
+# Odin Kroeger, 2018.
+#
+# This is free software released into the public domain.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+
+import secrets
+import re
+import sys
+from argparse import ArgumentParser, FileType
+
+parser = ArgumentParser()
+parser.add_argument('-w', '--list', default=sys.stdin, type=FileType('rt'),
+    metavar='FILE', help='read wordlist from FILE (default: STDIN)')
+parser.add_argument('-l', '--length', default=6, type=int,
+    metavar='N', help='make passphrase N words long (default: 6)')
+parser.add_argument('-d', '--delim', default=' ', type=str,
+    metavar='STR', help='use STR to join words (default: space)')
+
+args = parser.parse_args()
+rand = secrets.SystemRandom()
+words = [i.split()[1] for i in args.list if re.match(r'\s*\d+\s+[^\s]+$', i)]
+phrase = [rand.choice(words) for _ in range(args.length)]
+
+print(args.delim.join(phrase))
